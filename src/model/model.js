@@ -9,9 +9,10 @@ const expenseSchema = new Schema({
     cost: {
         type: Number,
         required: true
-      },
+      }
 });
 
+expenseSchema.set('timestamps', true);
 const Expense = mongoose.model('expenses', expenseSchema);
 
 module.exports = Expense;

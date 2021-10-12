@@ -27,7 +27,7 @@ module.exports.allExpenses = async (req,res) => {
 // create a new expense
 module.exports.newExpense = async (req,res) => {
     try {
-        if (typeof req.body.text == 'string' && typeof req.body.cost == 'number') {
+        if (typeof req.body.text == 'string' && typeof Number(req.body.cost) == 'number') {
             const result = await newExpense(req, res);
             res.send(result);
         } else {
@@ -56,7 +56,7 @@ module.exports.newExpense = async (req,res) => {
 // update an expense
 module.exports.updatedExpense = async (req,res) => {
     try {
-        if (typeof req.body.text == 'string' || typeof req.body.cost == 'number') {
+        if (typeof req.body.text == 'string' || typeof Number(req.body.cost) == 'number') {
             const result = await updatedExpense(req, res);
             res.send(result);
         } else {
@@ -109,20 +109,3 @@ module.exports.deletedExpense = async (req,res) => {
         }
     }
 };
-
-// delete all expenses
-// module.exports.deleteAllExpenses = async (req,res) => {
-//     try {
-//         const result = await deleteAllExpenses();
-//         res.send(
-//             result,
-//         );
-//     } catch (error) {
-//         res.status(500)
-//             .send({
-//                 message: "Internal server error",
-//                 error: "Internal server",
-//                 status: 500,
-//             });
-//     }
-// };
