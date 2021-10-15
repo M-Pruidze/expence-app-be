@@ -9,7 +9,11 @@ const expenseSchema = new Schema({
     cost: {
         type: Number,
         required: true
-      }
+      },
+    userId: {
+        type: String,
+        required: true,
+      },
 });
 
 expenseSchema.set('timestamps', true);
