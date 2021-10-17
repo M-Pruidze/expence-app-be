@@ -1,8 +1,8 @@
 const Expense = require('../models/expense.model');
 
 
-module.exports.allExpenses = async (userId) => {
-  const userIdToString = userId.toString();
+module.exports.allExpenses = async (user) => {
+  const userIdToString = user._id.toString();
   const expenses = await Expense.find({userId: userIdToString});
   console.log(`expenses`, expenses);
   return expenses;
@@ -14,6 +14,8 @@ module.exports.newExpense = async (req, res) => {
     text: req.body.text,
     cost: req.body.cost,
     userId: req.body.userId,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
   });
   console.log(`here`)
   const newExpense = await expense.save();

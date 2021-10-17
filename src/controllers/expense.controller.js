@@ -10,11 +10,10 @@ const {
 // get all expenses
 module.exports.allExpenses = async (req,res) => {
     try {
-        const result = await allExpenses(req.user._id);
+        const result = await allExpenses(req.user);
         res.send(
             result,
         );
-        console.log(`req.body`, req.body)
         console.log(`req.user`, req.user)
         console.log(`result`, result)
     } catch (error) {

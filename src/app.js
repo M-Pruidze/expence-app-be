@@ -20,11 +20,11 @@ app.use(bodyParser.json());
 
 app.use(cors());
 
-module.exports = app;
-
 app.use(express.urlencoded({ extended: false }));
 app.use('/auth', auth);
 app.use(passport.initialize());
 app.use('/user/:id', passport.authenticate('jwt', {session: false}), user);
 app.use('/', passport.authenticate('jwt', {session: false}), routes);
 
+
+module.exports = app;
