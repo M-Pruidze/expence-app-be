@@ -8,7 +8,7 @@ const {
     updatedExpense,
     deletedExpense,
     // deleteAllExpenses,
-  } = require('../controllers/controller');
+  } = require('../controllers/expense.controller');
 
 // expense routes
 router.get('/expense', allExpenses);

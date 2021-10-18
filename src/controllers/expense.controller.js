@@ -1,20 +1,23 @@
-const Expense = require('../model/model');
+const Expense = require('../models/expense.model');
 const {
     allExpenses,
     newExpense,
     updatedExpense,
     deletedExpense,
     // deleteAllExpenses,
-    } = require('../data/data');
+    } = require('../data/expense.data');
 
 // get all expenses
 module.exports.allExpenses = async (req,res) => {
     try {
-        const result = await allExpenses();
+        const result = await allExpenses(req.user);
         res.send(
             result,
         );
+        console.log(`req.user`, req.user)
+        console.log(`result`, result)
     } catch (error) {
+        console.log(`error`, error)
         res.status(500)
             .send({
                 message: "Internal server error",
@@ -24,12 +27,15 @@ module.exports.allExpenses = async (req,res) => {
     }
 };
 
+
+
 // create a new expense
 module.exports.newExpense = async (req,res) => {
     try {
         if (typeof req.body.text == 'string' && typeof Number(req.body.cost) == 'number') {
             const result = await newExpense(req, res);
             res.send(result);
+            console.log(`result`, result)
         } else {
             throw {
                 message: "Invalid fields type",
@@ -38,13 +44,15 @@ module.exports.newExpense = async (req,res) => {
             }
         }
     } catch (error) {
+        console.log(`error`, error)
         if (error.status == 400) {
           res.status(error.status)
              .send(error);
         } else {
+            console.log(`req.body`, req.body)
           res.status(500)
              .send({
-                message: "Internal server error",
+                message: error.message,
                 error: "Internal server",
                 status: 500,
              });

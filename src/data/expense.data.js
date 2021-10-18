@@ -1,16 +1,25 @@
-const Expense = require('../model/model');
+const Expense = require('../models/expense.model');
 
-module.exports.allExpenses = async () => {
-  const expenses = await Expense.find();
+
+module.exports.allExpenses = async (user) => {
+  const userIdToString = user._id.toString();
+  const expenses = await Expense.find({userId: userIdToString});
+  console.log(`expenses`, expenses);
   return expenses;
 };
 
+
 module.exports.newExpense = async (req, res) => {
-  const task = new Expense({
+  const expense = new Expense({
     text: req.body.text,
     cost: req.body.cost,
+    userId: req.body.userId,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
   });
-  const newExpense = await task.save();
+  console.log(`here`)
+  const newExpense = await expense.save();
+  console.log(`newExpense`, newExpense)
   return newExpense;
 };
 
