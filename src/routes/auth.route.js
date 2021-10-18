@@ -9,10 +9,10 @@ const bcrypt = require('bcrypt');
 // login
 router.post('/login', (req, res) => {
   passport.authenticate('local', { session: false }, (err, user, info) => {
-    if (err || !user) return res.status(400).json({
+    if (err || !user) return res.status(404).json({
       message: 'неверная почта или пароль',
       error: "Bad Request",
-      statusCode: "400",
+      statusCode: "404",
     });
     if (err) res.send(err);
     const token = jwt.sign(user.toJSON(), process.env.JWT_SECRET, { expiresIn: process.env.TOKEN_TTL });
@@ -29,22 +29,31 @@ router.post('/', async (req, res, next) => {
       Object.keys(req.body.lastName).length == 0 ||
       Object.keys(req.body.password).length == 0
       ) {
-      throw new Error('пожалуйста, заполните все поля');
+      throw {
+        message: 'пожалуйста, заполните все поля',
+        error: "Bad request",
+        status: '400',
+      };
     }
     if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email)) {
       throw new Error('пожалуйста, введите правильный адрес электронной почты');
     }
     const userEmail = await User.find({ email: req.body.email });
     if (userEmail.length > 0) {
-      throw new Error(`${req.body.email} уже используется`);
+      throw {
+        message: `${req.body.email} уже используется`,
+        error: 'Conflict',
+        status: '409',
+      };
     }
-  
+
     const invalidParameters = Validate.checkParamsPresent(req.body, ['firstName', 'lastName', 'email', 'password']);
     if (invalidParameters.length > 0) {
-      throw new Error({
-        status: 400,
-        result: "invalid parameters: " + invalidParameters,
-      });
+      throw {
+        message: "invalid parameters: " + invalidParameters,
+        error: "Bad request",
+        status: '400',
+      };
     }
     const user = new User({
       'firstName': req.body.firstName,
@@ -61,15 +70,23 @@ router.post('/', async (req, res, next) => {
         result: user,
       });
     });
-  } catch (e) {
-    console.log(`e`, e)
-    res.status(400).json({
-      message: e.message,
-      error: "Bad Request",
-      statusCode: "400",
-    });
+  } catch (error) {
+    console.log(`error`, error.message)
+        if (error.status == '400') {
+          res.status(error.status)
+             .send(error);
+        } else if (error.status == '409') {
+          res.status(error.status)
+             .send(error);
+        } else {
+          res.status('500')
+             .send({
+                message: error.message,
+                error: "Internal server",
+                status: 500,
+             });
+        }
   }
-
 });
 
 module.exports = router;
