@@ -9,10 +9,11 @@ const bcrypt = require('bcrypt');
 // login
 router.post('/login', (req, res) => {
   passport.authenticate('local', { session: false }, (err, user, info) => {
-    console.log(`err`, err)
-    console.log(`user`, user)
-    if (err || !user) return res.status(400).json({ info });
-    console.log(`login user`, user)
+    if (err || !user) return res.status(400).json({
+      message: 'неверная почта или пароль',
+      error: "Bad Request",
+      statusCode: "400",
+    });
     if (err) res.send(err);
     const token = jwt.sign(user.toJSON(), process.env.JWT_SECRET, { expiresIn: process.env.TOKEN_TTL });
     return res.json({ user, token, note: "pass this token in header as a bearerToken :)))" });
@@ -22,34 +23,28 @@ router.post('/login', (req, res) => {
 // sign up
 router.post('/', async (req, res, next) => {
   try {
+    if (
+      Object.keys(req.body.firstName).length == 0 ||
+      Object.keys(req.body.email).length == 0 ||
+      Object.keys(req.body.lastName).length == 0 ||
+      Object.keys(req.body.password).length == 0
+      ) {
+      throw new Error('пожалуйста, заполните все поля');
+    }
     if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email)) {
-      // res.status(400).send('please Enter correct email');
-      throw new Error('please Enter correct email');
-      // return false;
+      throw new Error('пожалуйста, введите правильный адрес электронной почты');
     }
-    User.find({ email: req.body.email }, (err, user) => {
-      if (user.length > 0) {
-        // res.send(req.body.email + " already in use");
-        // return false;
-        throw new Error(`${req.body.email} + already in use`);
-      }
-    });
-    if (Object.keys(req.body).length == 0) {
-      // res.status(400).send("empty parameters");
-      throw new Error('empty parameters');
-      // return false;
+    const userEmail = await User.find({ email: req.body.email });
+    if (userEmail.length > 0) {
+      throw new Error(`${req.body.email} уже используется`);
     }
+  
     const invalidParameters = Validate.checkParamsPresent(req.body, ['firstName', 'lastName', 'email', 'password']);
     if (invalidParameters.length > 0) {
-      // res.status(400).send({
-      //   status: 400,
-      //   result: "invalid parameters: " + invalidParameters,
-      // });
       throw new Error({
         status: 400,
         result: "invalid parameters: " + invalidParameters,
       });
-      // return false;
     }
     const user = new User({
       'firstName': req.body.firstName,
@@ -57,19 +52,22 @@ router.post('/', async (req, res, next) => {
       'email': req.body.email,
       'password': req.body.password,
     });
-    console.log(`user`, user)
     const hash = await bcrypt.hash(user.password, 10);
     user.password = hash;
 
     user.save((err, user) => {
       if (err) return next(err);
-      console.log(`save user`, user)
       res.send({
         result: user,
       });
     });
   } catch (e) {
-    res.status(400).json(e.message)
+    console.log(`e`, e)
+    res.status(400).json({
+      message: e.message,
+      error: "Bad Request",
+      statusCode: "400",
+    });
   }
 
 });
