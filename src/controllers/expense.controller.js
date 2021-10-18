@@ -1,4 +1,3 @@
-const Expense = require('../models/expense.model');
 const {
     allExpenses,
     newExpense,
@@ -14,8 +13,6 @@ module.exports.allExpenses = async (req,res) => {
         res.send(
             result,
         );
-        console.log(`req.user`, req.user)
-        console.log(`result`, result)
     } catch (error) {
         console.log(`error`, error)
         res.status(500)
@@ -27,15 +24,12 @@ module.exports.allExpenses = async (req,res) => {
     }
 };
 
-
-
 // create a new expense
 module.exports.newExpense = async (req,res) => {
     try {
         if (typeof req.body.text == 'string' && typeof Number(req.body.cost) == 'number') {
             const result = await newExpense(req, res);
             res.send(result);
-            console.log(`result`, result)
         } else {
             throw {
                 message: "Invalid fields type",
@@ -44,12 +38,10 @@ module.exports.newExpense = async (req,res) => {
             }
         }
     } catch (error) {
-        console.log(`error`, error)
         if (error.status == 400) {
           res.status(error.status)
              .send(error);
         } else {
-            console.log(`req.body`, req.body)
           res.status(500)
              .send({
                 message: error.message,
@@ -88,7 +80,6 @@ module.exports.updatedExpense = async (req,res) => {
         }
     }
 };
-
 
 // delete an expense
 module.exports.deletedExpense = async (req,res) => {

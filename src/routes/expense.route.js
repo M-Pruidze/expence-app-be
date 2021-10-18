@@ -17,5 +17,4 @@ router.put('/expense/:id', updatedExpense);
 router.delete('/expense/:id', deletedExpense);
 // router.delete('/expense/', deleteAllExpenses);
 
-
 module.exports = router;

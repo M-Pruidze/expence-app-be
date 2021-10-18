@@ -71,7 +71,6 @@ router.post('/', async (req, res, next) => {
       });
     });
   } catch (error) {
-    console.log(`error`, error.message)
         if (error.status == '400') {
           res.status(error.status)
              .send(error);
